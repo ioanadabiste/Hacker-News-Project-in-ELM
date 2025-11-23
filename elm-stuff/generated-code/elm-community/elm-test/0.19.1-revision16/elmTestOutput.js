@@ -8316,18 +8316,95 @@ var $author$project$Model$LoadingPosts = function (a) {
 	return {$: 'LoadingPosts', a: a};
 };
 var $author$project$Effect$NoEffect = {$: 'NoEffect'};
-var $author$project$Model$PostIds$advance = function (_v0) {
-	return _Debug_todo(
-		'Model.PostIds',
-		{
-			start: {line: 64, column: 5},
-			end: {line: 64, column: 15}
-		})('advance');
+var $author$project$Model$PostIds$PostIds = function (a) {
+	return {$: 'PostIds', a: a};
 };
 var $author$project$Cursor$current = function (_v0) {
 	var a = _v0.b;
 	return a;
 };
+var $author$project$Cursor$Cursor = F3(
+	function (a, b, c) {
+		return {$: 'Cursor', a: a, b: b, c: c};
+	});
+var $author$project$Cursor$forward = function (_v0) {
+	var l = _v0.a;
+	var m = _v0.b;
+	var r = _v0.c;
+	if (!r.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var z = r.a;
+		var zs = r.b;
+		return $elm$core$Maybe$Just(
+			A3(
+				$author$project$Cursor$Cursor,
+				A2($elm$core$List$cons, m, l),
+				z,
+				zs));
+	}
+};
+var $author$project$Model$PostIds$advance = function (_v0) {
+	var cur = _v0.a;
+	var _v1 = $author$project$Cursor$forward(cur);
+	if (_v1.$ === 'Nothing') {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var next = _v1.a;
+		return $elm$core$Maybe$Just(
+			_Utils_Tuple2(
+				$author$project$Cursor$current(next),
+				$author$project$Model$PostIds$PostIds(next)));
+	}
+};
+var $author$project$Model$PostsConfig$Posted = {$: 'Posted'};
+var $author$project$Model$PostsConfig$Score = {$: 'Score'};
+var $author$project$Model$PostsConfig$Title = {$: 'Title'};
+var $author$project$Model$PostsConfig$sortFromString = function (str) {
+	switch (str) {
+		case 'Score':
+			return $elm$core$Maybe$Just($author$project$Model$PostsConfig$Score);
+		case 'Title':
+			return $elm$core$Maybe$Just($author$project$Model$PostsConfig$Title);
+		case 'Posted':
+			return $elm$core$Maybe$Just($author$project$Model$PostsConfig$Posted);
+		case 'None':
+			return $elm$core$Maybe$Just($author$project$Model$PostsConfig$None);
+		default:
+			return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Model$PostsConfig$applyChanges = F2(
+	function (change, cfg) {
+		switch (change.$) {
+			case 'ChangePostsToShow':
+				var n = change.a;
+				return _Utils_update(
+					cfg,
+					{postsToShow: n});
+			case 'ChangeSortBy':
+				var str = change.a;
+				var _v1 = $author$project$Model$PostsConfig$sortFromString(str);
+				if (_v1.$ === 'Just') {
+					var s = _v1.a;
+					return _Utils_update(
+						cfg,
+						{sortBy: s});
+				} else {
+					return cfg;
+				}
+			case 'ChangeShowJobs':
+				var b = change.a;
+				return _Utils_update(
+					cfg,
+					{showJobs: b});
+			default:
+				var b = change.a;
+				return _Utils_update(
+					cfg,
+					{showTextOnly: b});
+		}
+	});
 var $author$project$Model$PostIds$first = function (_v0) {
 	var ids = _v0.a;
 	return $author$project$Cursor$current(ids);
@@ -8338,12 +8415,46 @@ var $author$project$Effect$GetPost = function (a) {
 var $author$project$Model$GotPost = function (a) {
 	return {$: 'GotPost', a: a};
 };
-var $author$project$Model$Post$decode = _Debug_todo(
-	'Model.Post',
-	{
-		start: {line: 38, column: 5},
-		end: {line: 38, column: 15}
-	})('Post.decode');
+var $author$project$Model$Post$Post = F7(
+	function (by, id, score, title, url, time, type_) {
+		return {by: by, id: id, score: score, time: time, title: title, type_: type_, url: url};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Decode$map = _Json_map1;
+var $elm$json$Json$Decode$map7 = _Json_map7;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$json$Json$Decode$succeed = _Json_succeed;
+var $elm$json$Json$Decode$maybe = function (decoder) {
+	return $elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder),
+				$elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing)
+			]));
+};
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Model$Post$decode = A8(
+	$elm$json$Json$Decode$map7,
+	$author$project$Model$Post$Post,
+	A2($elm$json$Json$Decode$field, 'by', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'score', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
+	A2(
+		$elm$json$Json$Decode$field,
+		'url',
+		$elm$json$Json$Decode$maybe($elm$json$Json$Decode$string)),
+	A2(
+		$elm$json$Json$Decode$field,
+		'time',
+		A2(
+			$elm$json$Json$Decode$map,
+			function (n) {
+				return $elm$time$Time$millisToPosix(n * 1000);
+			},
+			$elm$json$Json$Decode$int)),
+	A2($elm$json$Json$Decode$field, 'type', $elm$json$Json$Decode$string));
 var $author$project$Main$getPost = F2(
 	function (apiUrl, postId) {
 		return $author$project$Effect$GetPost(
@@ -8356,12 +8467,27 @@ var $author$project$Effect$GetItems = function (a) {
 var $author$project$Model$GotPostIds = function (a) {
 	return {$: 'GotPostIds', a: a};
 };
-var $author$project$Model$PostIds$decode = _Debug_todo(
-	'Model.PostIds',
-	{
-		start: {line: 97, column: 5},
-		end: {line: 97, column: 15}
-	})('PostIds.decode');
+var $author$project$Cursor$fromList = function (xs) {
+	if (!xs.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var y = xs.a;
+		var ys = xs.b;
+		return $elm$core$Maybe$Just(
+			A3($author$project$Cursor$Cursor, _List_Nil, y, ys));
+	}
+};
+var $author$project$Model$PostIds$fromList = function (ids) {
+	return A2(
+		$elm$core$Maybe$map,
+		$author$project$Model$PostIds$PostIds,
+		$author$project$Cursor$fromList(ids));
+};
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $author$project$Model$PostIds$decode = A2(
+	$elm$json$Json$Decode$map,
+	$author$project$Model$PostIds$fromList,
+	$elm$json$Json$Decode$list($elm$json$Json$Decode$int));
 var $author$project$Main$getItems = F2(
 	function (apiUrl, item) {
 		return $author$project$Effect$GetItems(
@@ -8477,13 +8603,12 @@ var $author$project$Main$update = F2(
 						if (_v1.a.$ === 'LoadedPosts') {
 							var state = _v1.a.a;
 							var change = _v1.b.a;
+							var updatedConfig = A2($author$project$Model$PostsConfig$applyChanges, change, state.config);
 							return _Utils_Tuple2(
-								_Debug_todo(
-									'Main',
-									{
-										start: {line: 152, column: 23},
-										end: {line: 152, column: 33}
-									})('update the config in the update function'),
+								$author$project$Model$LoadedPosts(
+									_Utils_update(
+										state,
+										{config: updatedConfig})),
 								$author$project$Effect$NoEffect);
 						} else {
 							break _v1$4;
@@ -8501,9 +8626,7 @@ var $author$project$Main$update = F2(
 				{state: newState}),
 			cmd);
 	});
-var $elm$json$Json$Decode$map = _Json_map1;
 var $elm$json$Json$Decode$map2 = _Json_map2;
-var $elm$json$Json$Decode$succeed = _Json_succeed;
 var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
 		case 'Normal':
@@ -8518,25 +8641,677 @@ var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $author$project$View$Posts$postTable = F3(
-	function (_v0, _v1, _v2) {
-		return _Debug_todo(
-			'View.Posts',
-			{
-				start: {line: 33, column: 5},
-				end: {line: 33, column: 15}
-			})('postTable');
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
 	});
-var $author$project$View$Posts$postsConfigView = function (_v0) {
-	return _Debug_todo(
-		'View.Posts',
-		{
-			start: {line: 53, column: 5},
-			end: {line: 53, column: 15}
-		})('postsConfigView');
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $author$project$Util$Time$Duration = F4(
+	function (seconds, minutes, hours, days) {
+		return {days: days, hours: hours, minutes: minutes, seconds: seconds};
+	});
+var $author$project$Util$Time$durationBetween = F2(
+	function (t1, t2) {
+		var m2 = $elm$time$Time$posixToMillis(t2);
+		var m1 = $elm$time$Time$posixToMillis(t1);
+		var diff = m2 - m1;
+		if (diff <= 0) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var totalSeconds = (diff / 1000) | 0;
+			var days = (totalSeconds / ((24 * 60) * 60)) | 0;
+			var rem1 = totalSeconds - (((days * 24) * 60) * 60);
+			var hours = (rem1 / (60 * 60)) | 0;
+			var rem2 = rem1 - ((hours * 60) * 60);
+			var minutes = (rem2 / 60) | 0;
+			var seconds = rem2 - (minutes * 60);
+			return $elm$core$Maybe$Just(
+				A4($author$project$Util$Time$Duration, seconds, minutes, hours, days));
+		}
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Util$Time$formatDuration = function (d) {
+	var s = (d.seconds > 0) ? $elm$core$Maybe$Just(
+		$elm$core$String$fromInt(d.seconds) + (' ' + ((d.seconds === 1) ? 'second' : 'seconds'))) : $elm$core$Maybe$Nothing;
+	var m = (d.minutes > 0) ? $elm$core$Maybe$Just(
+		$elm$core$String$fromInt(d.minutes) + (' ' + ((d.minutes === 1) ? 'minute' : 'minutes'))) : $elm$core$Maybe$Nothing;
+	var h = (d.hours > 0) ? $elm$core$Maybe$Just(
+		$elm$core$String$fromInt(d.hours) + (' ' + ((d.hours === 1) ? 'hour' : 'hours'))) : $elm$core$Maybe$Nothing;
+	var d_ = (d.days > 0) ? $elm$core$Maybe$Just(
+		$elm$core$String$fromInt(d.days) + (' ' + ((d.days === 1) ? 'day' : 'days'))) : $elm$core$Maybe$Nothing;
+	var parts = A2(
+		$elm$core$List$filterMap,
+		$elm$core$Basics$identity,
+		_List_fromArray(
+			[d_, h, m, s]));
+	var joined = A2($elm$core$String$join, ' ', parts);
+	return joined + ' ago';
 };
+var $author$project$Util$Time$monthToString = function (month) {
+	switch (month.$) {
+		case 'Jan':
+			return 'Jan';
+		case 'Feb':
+			return 'Feb';
+		case 'Mar':
+			return 'Mar';
+		case 'Apr':
+			return 'Apr';
+		case 'May':
+			return 'May';
+		case 'Jun':
+			return 'Jun';
+		case 'Jul':
+			return 'Jul';
+		case 'Aug':
+			return 'Aug';
+		case 'Sep':
+			return 'Sep';
+		case 'Oct':
+			return 'Oct';
+		case 'Nov':
+			return 'Nov';
+		default:
+			return 'Dec';
+	}
+};
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
+var $author$project$Util$Time$formatDate = function (_v0) {
+	var date = _v0.a;
+	var year = $elm$core$String$fromInt(date.year);
+	var month = $author$project$Util$Time$monthToString(date.month);
+	var day = A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(date.day));
+	return year + (' ' + (month + (' ' + day)));
+};
+var $author$project$Util$Time$Date = function (a) {
+	return {$: 'Date', a: a};
+};
+var $elm$time$Time$flooredDiv = F2(
+	function (numerator, denominator) {
+		return $elm$core$Basics$floor(numerator / denominator);
+	});
+var $elm$time$Time$toAdjustedMinutesHelp = F3(
+	function (defaultOffset, posixMinutes, eras) {
+		toAdjustedMinutesHelp:
+		while (true) {
+			if (!eras.b) {
+				return posixMinutes + defaultOffset;
+			} else {
+				var era = eras.a;
+				var olderEras = eras.b;
+				if (_Utils_cmp(era.start, posixMinutes) < 0) {
+					return posixMinutes + era.offset;
+				} else {
+					var $temp$defaultOffset = defaultOffset,
+						$temp$posixMinutes = posixMinutes,
+						$temp$eras = olderEras;
+					defaultOffset = $temp$defaultOffset;
+					posixMinutes = $temp$posixMinutes;
+					eras = $temp$eras;
+					continue toAdjustedMinutesHelp;
+				}
+			}
+		}
+	});
+var $elm$time$Time$toAdjustedMinutes = F2(
+	function (_v0, time) {
+		var defaultOffset = _v0.a;
+		var eras = _v0.b;
+		return A3(
+			$elm$time$Time$toAdjustedMinutesHelp,
+			defaultOffset,
+			A2(
+				$elm$time$Time$flooredDiv,
+				$elm$time$Time$posixToMillis(time),
+				60000),
+			eras);
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$time$Time$toCivil = function (minutes) {
+	var rawDay = A2($elm$time$Time$flooredDiv, minutes, 60 * 24) + 719468;
+	var era = (((rawDay >= 0) ? rawDay : (rawDay - 146096)) / 146097) | 0;
+	var dayOfEra = rawDay - (era * 146097);
+	var yearOfEra = ((((dayOfEra - ((dayOfEra / 1460) | 0)) + ((dayOfEra / 36524) | 0)) - ((dayOfEra / 146096) | 0)) / 365) | 0;
+	var dayOfYear = dayOfEra - (((365 * yearOfEra) + ((yearOfEra / 4) | 0)) - ((yearOfEra / 100) | 0));
+	var mp = (((5 * dayOfYear) + 2) / 153) | 0;
+	var month = mp + ((mp < 10) ? 3 : (-9));
+	var year = yearOfEra + (era * 400);
+	return {
+		day: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
+		month: month,
+		year: year + ((month <= 2) ? 1 : 0)
+	};
+};
+var $elm$time$Time$toDay = F2(
+	function (zone, time) {
+		return $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).day;
+	});
+var $elm$time$Time$Apr = {$: 'Apr'};
+var $elm$time$Time$Aug = {$: 'Aug'};
+var $elm$time$Time$Dec = {$: 'Dec'};
+var $elm$time$Time$Feb = {$: 'Feb'};
+var $elm$time$Time$Jan = {$: 'Jan'};
+var $elm$time$Time$Jul = {$: 'Jul'};
+var $elm$time$Time$Jun = {$: 'Jun'};
+var $elm$time$Time$Mar = {$: 'Mar'};
+var $elm$time$Time$May = {$: 'May'};
+var $elm$time$Time$Nov = {$: 'Nov'};
+var $elm$time$Time$Oct = {$: 'Oct'};
+var $elm$time$Time$Sep = {$: 'Sep'};
+var $elm$time$Time$toMonth = F2(
+	function (zone, time) {
+		var _v0 = $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).month;
+		switch (_v0) {
+			case 1:
+				return $elm$time$Time$Jan;
+			case 2:
+				return $elm$time$Time$Feb;
+			case 3:
+				return $elm$time$Time$Mar;
+			case 4:
+				return $elm$time$Time$Apr;
+			case 5:
+				return $elm$time$Time$May;
+			case 6:
+				return $elm$time$Time$Jun;
+			case 7:
+				return $elm$time$Time$Jul;
+			case 8:
+				return $elm$time$Time$Aug;
+			case 9:
+				return $elm$time$Time$Sep;
+			case 10:
+				return $elm$time$Time$Oct;
+			case 11:
+				return $elm$time$Time$Nov;
+			default:
+				return $elm$time$Time$Dec;
+		}
+	});
+var $elm$time$Time$toYear = F2(
+	function (zone, time) {
+		return $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).year;
+	});
+var $author$project$Util$Time$posixToDate = F2(
+	function (tz, time) {
+		var year = A2($elm$time$Time$toYear, tz, time);
+		var month = A2($elm$time$Time$toMonth, tz, time);
+		var day = A2($elm$time$Time$toDay, tz, time);
+		return $author$project$Util$Time$Date(
+			{day: day, month: month, year: year});
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $elm$time$Time$toHour = F2(
+	function (zone, time) {
+		return A2(
+			$elm$core$Basics$modBy,
+			24,
+			A2(
+				$elm$time$Time$flooredDiv,
+				A2($elm$time$Time$toAdjustedMinutes, zone, time),
+				60));
+	});
+var $elm$time$Time$toMinute = F2(
+	function (zone, time) {
+		return A2(
+			$elm$core$Basics$modBy,
+			60,
+			A2($elm$time$Time$toAdjustedMinutes, zone, time));
+	});
+var $author$project$Util$Time$formatTime = F2(
+	function (tz, time) {
+		var minute = A3(
+			$elm$core$String$padLeft,
+			2,
+			_Utils_chr('0'),
+			$elm$core$String$fromInt(
+				A2($elm$time$Time$toMinute, tz, time)));
+		var hour = A3(
+			$elm$core$String$padLeft,
+			2,
+			_Utils_chr('0'),
+			$elm$core$String$fromInt(
+				A2($elm$time$Time$toHour, tz, time)));
+		var date = A2($author$project$Util$Time$posixToDate, tz, time);
+		return $author$project$Util$Time$formatDate(date) + (' ' + (hour + (':' + minute)));
+	});
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$html$Html$table = _VirtualDom_node('table');
+var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$th = _VirtualDom_node('th');
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
+var $author$project$View$Posts$postTable = F3(
+	function (cfg, now, posts) {
+		var viewRow = function (post) {
+			var rel = function () {
+				var _v1 = A2($author$project$Util$Time$durationBetween, post.time, now);
+				if (_v1.$ === 'Just') {
+					var d = _v1.a;
+					return ' (' + ($author$project$Util$Time$formatDuration(d) + ')');
+				} else {
+					return '';
+				}
+			}();
+			var absTime = A2($author$project$Util$Time$formatTime, $elm$time$Time$utc, post.time);
+			return A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('post-score')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromInt(post.score))
+							])),
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('post-title')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(post.title)
+							])),
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('post-type')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(post.type_)
+							])),
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('post-time')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								_Utils_ap(absTime, rel))
+							])),
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('post-url')
+							]),
+						_List_fromArray(
+							[
+								function () {
+								var _v0 = post.url;
+								if (_v0.$ === 'Just') {
+									var u = _v0.a;
+									return A2(
+										$elm$html$Html$a,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$href(u)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(u)
+											]));
+								} else {
+									return $elm$html$Html$text('');
+								}
+							}()
+							]))
+					]));
+		};
+		var headerRow = A2(
+			$elm$html$Html$tr,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('score')
+						])),
+					A2(
+					$elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('title')
+						])),
+					A2(
+					$elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('type')
+						])),
+					A2(
+					$elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('posted')
+						])),
+					A2(
+					$elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('link')
+						]))
+				]));
+		return A2(
+			$elm$html$Html$table,
+			_List_Nil,
+			A2(
+				$elm$core$List$cons,
+				headerRow,
+				A2($elm$core$List$map, viewRow, posts)));
+	});
+var $author$project$Model$PostsConfig$ChangePostsToShow = function (a) {
+	return {$: 'ChangePostsToShow', a: a};
+};
+var $author$project$Model$PostsConfig$ChangeShowJobs = function (a) {
+	return {$: 'ChangeShowJobs', a: a};
+};
+var $author$project$Model$PostsConfig$ChangeShowTextOnly = function (a) {
+	return {$: 'ChangeShowTextOnly', a: a};
+};
+var $author$project$Model$PostsConfig$ChangeSortBy = function (a) {
+	return {$: 'ChangeSortBy', a: a};
+};
+var $author$project$Model$ConfigChanged = function (a) {
+	return {$: 'ConfigChanged', a: a};
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$html$Html$Events$targetChecked = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'checked']),
+	$elm$json$Json$Decode$bool);
+var $elm$html$Html$Events$onCheck = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetChecked));
+};
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
+var $author$project$Model$PostsConfig$sortOptions = _List_fromArray(
+	[$author$project$Model$PostsConfig$Score, $author$project$Model$PostsConfig$Title, $author$project$Model$PostsConfig$Posted, $author$project$Model$PostsConfig$None]);
+var $author$project$Model$PostsConfig$sortToString = function (sort) {
+	switch (sort.$) {
+		case 'Score':
+			return 'Score';
+		case 'Title':
+			return 'Title';
+		case 'Posted':
+			return 'Posted';
+		default:
+			return 'None';
+	}
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$View$Posts$postsConfigView = function (cfg) {
+	var sortSelect = A2(
+		$elm$html$Html$select,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$id('select-sort-by'),
+				$elm$html$Html$Events$onInput(
+				function (v) {
+					return $author$project$Model$ConfigChanged(
+						$author$project$Model$PostsConfig$ChangeSortBy(v));
+				})
+			]),
+		A2(
+			$elm$core$List$map,
+			function (opt) {
+				return A2(
+					$elm$html$Html$option,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$selected(
+							_Utils_eq(
+								$author$project$Model$PostsConfig$sortToString(cfg.sortBy),
+								$author$project$Model$PostsConfig$sortToString(opt)))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$author$project$Model$PostsConfig$sortToString(opt))
+						]));
+			},
+			$author$project$Model$PostsConfig$sortOptions));
+	var showTextOnlyCheckbox = A2(
+		$elm$html$Html$label,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$type_('checkbox'),
+						$elm$html$Html$Attributes$id('checkbox-show-text-only-posts'),
+						$elm$html$Html$Attributes$checked(cfg.showTextOnly),
+						$elm$html$Html$Events$onCheck(
+						function (b) {
+							return $author$project$Model$ConfigChanged(
+								$author$project$Model$PostsConfig$ChangeShowTextOnly(b));
+						})
+					]),
+				_List_Nil),
+				$elm$html$Html$text('Show text only posts')
+			]));
+	var showJobsCheckbox = A2(
+		$elm$html$Html$label,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$type_('checkbox'),
+						$elm$html$Html$Attributes$id('checkbox-show-job-posts'),
+						$elm$html$Html$Attributes$checked(cfg.showJobs),
+						$elm$html$Html$Events$onCheck(
+						function (b) {
+							return $author$project$Model$ConfigChanged(
+								$author$project$Model$PostsConfig$ChangeShowJobs(b));
+						})
+					]),
+				_List_Nil),
+				$elm$html$Html$text('Show job posts')
+			]));
+	var postsPerPageSelect = A2(
+		$elm$html$Html$select,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$id('select-posts-per-page'),
+				$elm$html$Html$Events$onInput(
+				function (v) {
+					return $author$project$Model$ConfigChanged(
+						$author$project$Model$PostsConfig$ChangePostsToShow(
+							A2(
+								$elm$core$Maybe$withDefault,
+								cfg.postsToShow,
+								$elm$core$String$toInt(v))));
+				})
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$option,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$selected(cfg.postsToShow === 10)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('10')
+					])),
+				A2(
+				$elm$html$Html$option,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$selected(cfg.postsToShow === 25)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('25')
+					])),
+				A2(
+				$elm$html$Html$option,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$selected(cfg.postsToShow === 50)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('50')
+					]))
+			]));
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[postsPerPageSelect, sortSelect, showJobsCheckbox, showTextOnlyCheckbox]));
+};
 var $author$project$Main$view = function (model) {
 	var title = _Utils_eq(model.config.mode, $author$project$Model$Dev) ? 'HackerNews (DEV)' : 'HackerNews';
 	var body = function () {
@@ -8661,7 +9436,6 @@ var $author$project$SimulatedEffect$fromLoadedState = function () {
 		afterFirstRequest,
 		posts);
 }();
-var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $author$project$TestData$jobPosts = _List_fromArray(
 	[
 		{
@@ -9223,24 +9997,6 @@ var $elm$core$List$filter = F2(
 var $elm_explorations$test$AsciiTable$AlignLeft = {$: 'AlignLeft'};
 var $elm_explorations$test$AsciiTable$AlignRight = {$: 'AlignRight'};
 var $elm_explorations$test$Test$Runner$Distribution$bars = 30;
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
-var $elm$core$String$repeatHelp = F3(
-	function (n, chunk, result) {
-		return (n <= 0) ? result : A3(
-			$elm$core$String$repeatHelp,
-			n >> 1,
-			_Utils_ap(chunk, chunk),
-			(!(n & 1)) ? result : _Utils_ap(result, chunk));
-	});
-var $elm$core$String$repeat = F2(
-	function (n, chunk) {
-		return A3($elm$core$String$repeatHelp, n, chunk, '');
-	});
 var $elm$core$String$padRight = F3(
 	function (n, _char, string) {
 		return _Utils_ap(
@@ -9264,15 +10020,6 @@ var $elm_explorations$test$Test$Runner$Distribution$barView = function (_v0) {
 };
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$List$map3 = _List_map3;
-var $elm$core$String$padLeft = F3(
-	function (n, _char, string) {
-		return _Utils_ap(
-			A2(
-				$elm$core$String$repeat,
-				n - $elm$core$String$length(string),
-				$elm$core$String$fromChar(_char)),
-			string);
-	});
 var $elm_explorations$test$MicroListExtra$rowsLength = function (listOfLists) {
 	if (!listOfLists.b) {
 		return 0;
@@ -9471,9 +10218,6 @@ var $elm_explorations$test$Test$Runner$Distribution$isStrictSubset = F2(
 			all);
 		return A2($elm$core$List$any, containsCombinationFully, allSets);
 	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $elm$core$List$partition = F2(
 	function (pred, list) {
 		var step = F2(
@@ -9703,24 +10447,6 @@ var $author$project$Test$Reporter$Console$failureLabelsToText = A2(
 			$author$project$Test$Reporter$Console$withChar(
 				_Utils_chr('✗')))),
 	$author$project$Console$Text$concat);
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
 var $elm$core$Basics$always = F2(
 	function (a, _v0) {
 		return a;
@@ -11895,11 +12621,8 @@ var $author$project$Test$Runner$JsMessage$Test = function (a) {
 	return {$: 'Test', a: a};
 };
 var $elm$json$Json$Decode$fail = _Json_fail;
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $elm$json$Json$Decode$list = _Json_decodeList;
 var $elm$json$Json$Decode$map3 = _Json_map3;
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Test$Runner$JsMessage$todoDecoder = A3(
 	$elm$json$Json$Decode$map2,
 	F2(
@@ -11946,10 +12669,6 @@ var $elm$time$Time$Name = function (a) {
 var $elm$time$Time$Offset = function (a) {
 	return {$: 'Offset', a: a};
 };
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
 var $elm$time$Time$customZone = $elm$time$Time$Zone;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $author$project$Test$Reporter$TestResults$Passed = function (a) {
@@ -12410,7 +13129,6 @@ var $elm_explorations$test$Test$Html$Selector$Internal$Invalid = {$: 'Invalid'};
 var $elm_explorations$test$Test$Html$Selector$Internal$Style = function (a) {
 	return {$: 'Style', a: a};
 };
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm_explorations$test$Test$Html$Selector$Internal$Attribute = function (a) {
 	return {$: 'Attribute', a: a};
 };
@@ -12462,10 +13180,6 @@ var $elm_explorations$test$Test$Html$Internal$ElmHtml$InternalTypes$PropertyReco
 var $elm_explorations$test$Test$Html$Internal$ElmHtml$InternalTypes$Style = function (a) {
 	return {$: 'Style', a: a};
 };
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
 var $elm_explorations$test$Test$Html$Internal$ElmHtml$Constants$attributeKey = 'a3';
 var $elm_explorations$test$Test$Html$Internal$ElmHtml$Constants$attributeNamespaceKey = 'a4';
 var $elm_explorations$test$Test$Html$Internal$ElmHtml$Constants$propKey = 'a2';
@@ -12601,14 +13315,6 @@ var $elm_explorations$test$Test$Html$Selector$Internal$Tag = function (a) {
 var $elm_explorations$test$Test$Html$Selector$tag = function (name) {
 	return $elm_explorations$test$Test$Html$Selector$Internal$Tag(name);
 };
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$PostsViewTests$selectShowJobPostsCheckbox = $elm_explorations$test$Test$Html$Selector$all(
 	_List_fromArray(
 		[
@@ -12653,11 +13359,6 @@ var $author$project$PostsViewTests$selectElementContainingShowTextPostsCheckbox 
 				$elm_explorations$test$Test$Html$Selector$text('text')
 			]))
 	]);
-var $elm_explorations$test$Test$todo = function (desc) {
-	return $elm_explorations$test$Test$Internal$failNow(
-		{description: desc, reason: $elm_explorations$test$Test$Runner$Failure$TODO});
-};
-var $author$project$Example$suite = $elm_explorations$test$Test$todo('Implement our first test. See https://package.elm-lang.org/packages/elm-explorations/test/latest for how to do this!');
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -12668,41 +13369,27 @@ var $elm$core$Maybe$andThen = F2(
 		}
 	});
 var $author$project$Cursor$back = function (_v0) {
-	return _Debug_todo(
-		'Cursor',
-		{
-			start: {line: 99, column: 5},
-			end: {line: 99, column: 15}
-		})('back');
-};
-var $author$project$Cursor$forward = function (_v0) {
-	return _Debug_todo(
-		'Cursor',
-		{
-			start: {line: 82, column: 5},
-			end: {line: 82, column: 15}
-		})('forward');
-};
-var $author$project$Cursor$fromList = function (_v0) {
-	return _Debug_todo(
-		'Cursor',
-		{
-			start: {line: 40, column: 5},
-			end: {line: 40, column: 15}
-		})('fromList');
+	var l = _v0.a;
+	var m = _v0.b;
+	var r = _v0.c;
+	if (!l.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var z = l.a;
+		var zs = l.b;
+		return $elm$core$Maybe$Just(
+			A3(
+				$author$project$Cursor$Cursor,
+				zs,
+				z,
+				A2($elm$core$List$cons, m, r)));
+	}
 };
 var $author$project$Cursor$length = function (_v0) {
-	return _Debug_todo(
-		'Cursor',
-		{
-			start: {line: 112, column: 5},
-			end: {line: 112, column: 15}
-		})('length');
+	var l = _v0.a;
+	var r = _v0.c;
+	return (1 + $elm$core$List$length(l)) + $elm$core$List$length(r);
 };
-var $author$project$Cursor$Cursor = F3(
-	function (a, b, c) {
-		return {$: 'Cursor', a: a, b: b, c: c};
-	});
 var $author$project$Cursor$nonEmpty = F2(
 	function (x, xs) {
 		return A3($author$project$Cursor$Cursor, _List_Nil, x, xs);
@@ -12727,12 +13414,12 @@ var $elm_explorations$test$Test$test = F2(
 				}));
 	});
 var $author$project$Cursor$toList = function (_v0) {
-	return _Debug_todo(
-		'Cursor',
-		{
-			start: {line: 51, column: 5},
-			end: {line: 51, column: 15}
-		})('toList');
+	var left = _v0.a;
+	var mid = _v0.b;
+	var right = _v0.c;
+	return _Utils_ap(
+		$elm$core$List$reverse(left),
+		A2($elm$core$List$cons, mid, right));
 };
 var $author$project$Cursor$withSelectedElement = F3(
 	function (left, mid, right) {
@@ -12944,9 +13631,6 @@ var $author$project$ExampleTests$CursorTests$suite = A2(
 					})
 				]))
 		]));
-var $author$project$Model$PostIds$PostIds = function (a) {
-	return {$: 'PostIds', a: a};
-};
 var $author$project$ExampleTests$ModelPostIdsTests$suite = A2(
 	$elm_explorations$test$Test$describe,
 	'module Model.PostIds',
@@ -13043,16 +13727,6 @@ var $author$project$ExampleTests$ModelPostIdsTests$suite = A2(
 					})
 				]))
 		]));
-var $author$project$Model$PostsConfig$Score = {$: 'Score'};
-var $author$project$Model$PostsConfig$Title = {$: 'Title'};
-var $author$project$Model$PostsConfig$sortFromString = function (_v0) {
-	return _Debug_todo(
-		'Model.PostsConfig',
-		{
-			start: {line: 48, column: 5},
-			end: {line: 48, column: 15}
-		})('sortFromString');
-};
 var $author$project$ExampleTests$ModelPostsConfigTests$suite = A2(
 	$elm_explorations$test$Test$describe,
 	'module Model.PostsConfig',
@@ -13092,27 +13766,6 @@ var $author$project$ExampleTests$ModelPostsConfigTests$suite = A2(
 					})
 				]))
 		]));
-var $author$project$Util$Time$Duration = F4(
-	function (seconds, minutes, hours, days) {
-		return {days: days, hours: hours, minutes: minutes, seconds: seconds};
-	});
-var $author$project$Util$Time$durationBetween = F2(
-	function (_v0, _v1) {
-		return _Debug_todo(
-			'Util.Time',
-			{
-				start: {line: 144, column: 5},
-				end: {line: 144, column: 15}
-			})('durationBetween');
-	});
-var $author$project$Util$Time$formatDuration = function (_v0) {
-	return _Debug_todo(
-		'Util.Time',
-		{
-			start: {line: 169, column: 5},
-			end: {line: 169, column: 15}
-		})('formatDuration');
-};
 var $author$project$ExampleTests$UtilTimeTests$suite = A2(
 	$elm_explorations$test$Test$describe,
 	'module Util.Time',
@@ -13344,7 +13997,6 @@ var $elm_explorations$test$Expect$all = F2(
 				reason: $elm_explorations$test$Test$Runner$Failure$Invalid($elm_explorations$test$Test$Runner$Failure$EmptyList)
 			}) : A2($elm_explorations$test$Expect$allHelp, list, query);
 	});
-var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm_explorations$test$Test$Html$Event$check = function (checked) {
 	return _Utils_Tuple2(
 		'change',
@@ -13412,7 +14064,6 @@ var $elm$json$Json$Decode$dict = function (decoder) {
 		$elm$json$Json$Decode$keyValuePairs(decoder));
 };
 var $elm_explorations$test$Test$Html$Internal$ElmHtml$Constants$eventKey = 'a0';
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $elm_explorations$test$Test$Html$Internal$ElmHtml$InternalTypes$decodeEvents = function (taggedEventDecoder) {
 	return $elm$json$Json$Decode$oneOf(
 		_List_fromArray(
@@ -13515,14 +14166,6 @@ var $elm_explorations$test$Test$Html$Internal$ElmHtml$InternalTypes$decodeStyles
 			$elm$json$Json$Decode$succeed($elm$core$Dict$empty)
 		]));
 var $elm$json$Json$Decode$map5 = _Json_map5;
-var $elm$json$Json$Decode$maybe = function (decoder) {
-	return $elm$json$Json$Decode$oneOf(
-		_List_fromArray(
-			[
-				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder),
-				$elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing)
-			]));
-};
 var $elm_explorations$test$Test$Html$Internal$ElmHtml$InternalTypes$decodeFacts = function (_v0) {
 	var taggers = _v0.a;
 	var eventDecoder = _v0.b;
@@ -13695,12 +14338,6 @@ var $elm$virtual_dom$VirtualDom$Custom = function (a) {
 };
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
 	return {$: 'MayPreventDefault', a: a};
-};
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
 };
 var $elm$core$Tuple$mapFirst = F2(
 	function (func, _v0) {
@@ -14713,7 +15350,6 @@ var $elm_explorations$test$Test$Html$Query$Internal$getElementAtHelp = F2(
 			}
 		}
 	});
-var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm_explorations$test$Test$Html$Query$Internal$getElementAt = F2(
 	function (index, list) {
 		var length = $elm$core$List$length(list);
@@ -23304,15 +23940,6 @@ var $author$project$PostsViewTests$ShowTextOnlyPostsCheckbox = function (a) {
 var $author$project$PostsViewTests$SortBySelect = function (a) {
 	return {$: 'SortBySelect', a: a};
 };
-var $author$project$Model$PostsConfig$applyChanges = F2(
-	function (_v0, _v1) {
-		return _Debug_todo(
-			'Model.PostsConfig',
-			{
-				start: {line: 91, column: 5},
-				end: {line: 91, column: 15}
-			})('applyChanges');
-	});
 var $elm_explorations$test$Test$Runner$Failure$ListDiff = F2(
 	function (a, b) {
 		return {$: 'ListDiff', a: a, b: b};
@@ -23353,14 +23980,53 @@ var $author$project$TestUtils$expectEach = F2(
 					$elm$core$List$length(l) - 1)),
 			l);
 	});
+var $author$project$Model$PostsConfig$sortToCompareFn = function (sort) {
+	switch (sort.$) {
+		case 'Score':
+			return F2(
+				function (a, b) {
+					return A2($elm$core$Basics$compare, b.score, a.score);
+				});
+		case 'Title':
+			return F2(
+				function (a, b) {
+					return A2($elm$core$Basics$compare, a.title, b.title);
+				});
+		case 'Posted':
+			return F2(
+				function (a, b) {
+					return A2(
+						$elm$core$Basics$compare,
+						$elm$time$Time$posixToMillis(b.time),
+						$elm$time$Time$posixToMillis(a.time));
+				});
+		default:
+			return F2(
+				function (_v1, _v2) {
+					return $elm$core$Basics$EQ;
+				});
+	}
+};
+var $elm$core$List$sortWith = _List_sortWith;
 var $author$project$Model$PostsConfig$filterPosts = F2(
-	function (_v0, _v1) {
-		return _Debug_todo(
-			'Model.PostsConfig',
-			{
-				start: {line: 108, column: 5},
-				end: {line: 108, column: 15}
-			})('filterPosts');
+	function (cfg, posts) {
+		var filtered1 = cfg.showTextOnly ? posts : A2(
+			$elm$core$List$filter,
+			function (p) {
+				return !_Utils_eq(p.url, $elm$core$Maybe$Nothing);
+			},
+			posts);
+		var filtered2 = cfg.showJobs ? filtered1 : A2(
+			$elm$core$List$filter,
+			function (p) {
+				return p.type_ !== 'job';
+			},
+			filtered1);
+		var sorted = A2(
+			$elm$core$List$sortWith,
+			$author$project$Model$PostsConfig$sortToCompareFn(cfg.sortBy),
+			filtered2);
+		return A2($elm$core$List$take, cfg.postsToShow, sorted);
 	});
 var $elm_explorations$test$Expect$onFail = F2(
 	function (str, expectation) {
@@ -23375,18 +24041,6 @@ var $elm_explorations$test$Expect$onFail = F2(
 		}
 	});
 var $elm$core$Debug$toString = _Debug_toString;
-var $author$project$Model$PostsConfig$sortToString = function (sort) {
-	switch (sort.$) {
-		case 'Score':
-			return 'Score';
-		case 'Title':
-			return 'Title';
-		case 'Posted':
-			return 'Posted';
-		default:
-			return 'None';
-	}
-};
 var $author$project$PostsViewTests$triggerConfigChangedEvent = function (ty) {
 	var _v0 = function () {
 		switch (ty.$) {
@@ -23765,198 +24419,6 @@ var $elm_explorations$test$Test$Html$Query$first = function (_v0) {
 		showTrace,
 		A2($elm_explorations$test$Test$Html$Query$Internal$prependSelector, query, $elm_explorations$test$Test$Html$Query$Internal$First));
 };
-var $author$project$Util$Time$monthToString = function (month) {
-	switch (month.$) {
-		case 'Jan':
-			return 'Jan';
-		case 'Feb':
-			return 'Feb';
-		case 'Mar':
-			return 'Mar';
-		case 'Apr':
-			return 'Apr';
-		case 'May':
-			return 'May';
-		case 'Jun':
-			return 'Jun';
-		case 'Jul':
-			return 'Jul';
-		case 'Aug':
-			return 'Aug';
-		case 'Sep':
-			return 'Sep';
-		case 'Oct':
-			return 'Oct';
-		case 'Nov':
-			return 'Nov';
-		default:
-			return 'Dec';
-	}
-};
-var $author$project$Util$Time$formatDate = function (_v0) {
-	var date = _v0.a;
-	var year = $elm$core$String$fromInt(date.year);
-	var month = $author$project$Util$Time$monthToString(date.month);
-	var day = A3(
-		$elm$core$String$padLeft,
-		2,
-		_Utils_chr('0'),
-		$elm$core$String$fromInt(date.day));
-	return year + (' ' + (month + (' ' + day)));
-};
-var $author$project$Util$Time$Date = function (a) {
-	return {$: 'Date', a: a};
-};
-var $elm$time$Time$flooredDiv = F2(
-	function (numerator, denominator) {
-		return $elm$core$Basics$floor(numerator / denominator);
-	});
-var $elm$time$Time$toAdjustedMinutesHelp = F3(
-	function (defaultOffset, posixMinutes, eras) {
-		toAdjustedMinutesHelp:
-		while (true) {
-			if (!eras.b) {
-				return posixMinutes + defaultOffset;
-			} else {
-				var era = eras.a;
-				var olderEras = eras.b;
-				if (_Utils_cmp(era.start, posixMinutes) < 0) {
-					return posixMinutes + era.offset;
-				} else {
-					var $temp$defaultOffset = defaultOffset,
-						$temp$posixMinutes = posixMinutes,
-						$temp$eras = olderEras;
-					defaultOffset = $temp$defaultOffset;
-					posixMinutes = $temp$posixMinutes;
-					eras = $temp$eras;
-					continue toAdjustedMinutesHelp;
-				}
-			}
-		}
-	});
-var $elm$time$Time$toAdjustedMinutes = F2(
-	function (_v0, time) {
-		var defaultOffset = _v0.a;
-		var eras = _v0.b;
-		return A3(
-			$elm$time$Time$toAdjustedMinutesHelp,
-			defaultOffset,
-			A2(
-				$elm$time$Time$flooredDiv,
-				$elm$time$Time$posixToMillis(time),
-				60000),
-			eras);
-	});
-var $elm$time$Time$toCivil = function (minutes) {
-	var rawDay = A2($elm$time$Time$flooredDiv, minutes, 60 * 24) + 719468;
-	var era = (((rawDay >= 0) ? rawDay : (rawDay - 146096)) / 146097) | 0;
-	var dayOfEra = rawDay - (era * 146097);
-	var yearOfEra = ((((dayOfEra - ((dayOfEra / 1460) | 0)) + ((dayOfEra / 36524) | 0)) - ((dayOfEra / 146096) | 0)) / 365) | 0;
-	var dayOfYear = dayOfEra - (((365 * yearOfEra) + ((yearOfEra / 4) | 0)) - ((yearOfEra / 100) | 0));
-	var mp = (((5 * dayOfYear) + 2) / 153) | 0;
-	var month = mp + ((mp < 10) ? 3 : (-9));
-	var year = yearOfEra + (era * 400);
-	return {
-		day: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
-		month: month,
-		year: year + ((month <= 2) ? 1 : 0)
-	};
-};
-var $elm$time$Time$toDay = F2(
-	function (zone, time) {
-		return $elm$time$Time$toCivil(
-			A2($elm$time$Time$toAdjustedMinutes, zone, time)).day;
-	});
-var $elm$time$Time$Apr = {$: 'Apr'};
-var $elm$time$Time$Aug = {$: 'Aug'};
-var $elm$time$Time$Dec = {$: 'Dec'};
-var $elm$time$Time$Feb = {$: 'Feb'};
-var $elm$time$Time$Jan = {$: 'Jan'};
-var $elm$time$Time$Jul = {$: 'Jul'};
-var $elm$time$Time$Jun = {$: 'Jun'};
-var $elm$time$Time$Mar = {$: 'Mar'};
-var $elm$time$Time$May = {$: 'May'};
-var $elm$time$Time$Nov = {$: 'Nov'};
-var $elm$time$Time$Oct = {$: 'Oct'};
-var $elm$time$Time$Sep = {$: 'Sep'};
-var $elm$time$Time$toMonth = F2(
-	function (zone, time) {
-		var _v0 = $elm$time$Time$toCivil(
-			A2($elm$time$Time$toAdjustedMinutes, zone, time)).month;
-		switch (_v0) {
-			case 1:
-				return $elm$time$Time$Jan;
-			case 2:
-				return $elm$time$Time$Feb;
-			case 3:
-				return $elm$time$Time$Mar;
-			case 4:
-				return $elm$time$Time$Apr;
-			case 5:
-				return $elm$time$Time$May;
-			case 6:
-				return $elm$time$Time$Jun;
-			case 7:
-				return $elm$time$Time$Jul;
-			case 8:
-				return $elm$time$Time$Aug;
-			case 9:
-				return $elm$time$Time$Sep;
-			case 10:
-				return $elm$time$Time$Oct;
-			case 11:
-				return $elm$time$Time$Nov;
-			default:
-				return $elm$time$Time$Dec;
-		}
-	});
-var $elm$time$Time$toYear = F2(
-	function (zone, time) {
-		return $elm$time$Time$toCivil(
-			A2($elm$time$Time$toAdjustedMinutes, zone, time)).year;
-	});
-var $author$project$Util$Time$posixToDate = F2(
-	function (tz, time) {
-		var year = A2($elm$time$Time$toYear, tz, time);
-		var month = A2($elm$time$Time$toMonth, tz, time);
-		var day = A2($elm$time$Time$toDay, tz, time);
-		return $author$project$Util$Time$Date(
-			{day: day, month: month, year: year});
-	});
-var $elm$time$Time$toHour = F2(
-	function (zone, time) {
-		return A2(
-			$elm$core$Basics$modBy,
-			24,
-			A2(
-				$elm$time$Time$flooredDiv,
-				A2($elm$time$Time$toAdjustedMinutes, zone, time),
-				60));
-	});
-var $elm$time$Time$toMinute = F2(
-	function (zone, time) {
-		return A2(
-			$elm$core$Basics$modBy,
-			60,
-			A2($elm$time$Time$toAdjustedMinutes, zone, time));
-	});
-var $author$project$Util$Time$formatTime = F2(
-	function (tz, time) {
-		var minute = A3(
-			$elm$core$String$padLeft,
-			2,
-			_Utils_chr('0'),
-			$elm$core$String$fromInt(
-				A2($elm$time$Time$toMinute, tz, time)));
-		var hour = A3(
-			$elm$core$String$padLeft,
-			2,
-			_Utils_chr('0'),
-			$elm$core$String$fromInt(
-				A2($elm$time$Time$toHour, tz, time)));
-		var date = A2($author$project$Util$Time$posixToDate, tz, time);
-		return $author$project$Util$Time$formatDate(date) + (' ' + (hour + (':' + minute)));
-	});
 var $elm_explorations$test$Test$Html$Query$Internal$Index = function (a) {
 	return {$: 'Index', a: a};
 };
@@ -23972,10 +24434,6 @@ var $elm_explorations$test$Test$Html$Query$index = F2(
 				query,
 				$elm_explorations$test$Test$Html$Query$Internal$Index(position)));
 	});
-var $author$project$Model$PostsConfig$Posted = {$: 'Posted'};
-var $author$project$Model$PostsConfig$sortOptions = _List_fromArray(
-	[$author$project$Model$PostsConfig$Score, $author$project$Model$PostsConfig$Title, $author$project$Model$PostsConfig$Posted, $author$project$Model$PostsConfig$None]);
-var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
 var $author$project$PostsViewTests$suite = A2(
 	$elm_explorations$test$Test$describe,
 	'module View.Posts',
@@ -24592,7 +25050,7 @@ var $author$project$Test$Generated$Main$main = A2(
 	{
 		globs: _List_Nil,
 		paths: _List_fromArray(
-			['D:\\PF\\proiect bun\\tests\\Example.elm', 'D:\\PF\\proiect bun\\tests\\ExampleTests\\CursorTests.elm', 'D:\\PF\\proiect bun\\tests\\ExampleTests\\ModelPostIdsTests.elm', 'D:\\PF\\proiect bun\\tests\\ExampleTests\\ModelPostsConfigTests.elm', 'D:\\PF\\proiect bun\\tests\\ExampleTests\\UtilTimeTests.elm', 'D:\\PF\\proiect bun\\tests\\MainTests.elm', 'D:\\PF\\proiect bun\\tests\\PostsConfigTests.elm', 'D:\\PF\\proiect bun\\tests\\PostsViewTests.elm', 'D:\\PF\\proiect bun\\tests\\PostTests.elm', 'D:\\PF\\proiect bun\\tests\\SimulatedEffect.elm', 'D:\\PF\\proiect bun\\tests\\TestData.elm', 'D:\\PF\\proiect bun\\tests\\TestUtils.elm']),
+			['D:\\PF\\proiect bun\\tests\\ExampleTests\\CursorTests.elm', 'D:\\PF\\proiect bun\\tests\\ExampleTests\\ModelPostIdsTests.elm', 'D:\\PF\\proiect bun\\tests\\ExampleTests\\ModelPostsConfigTests.elm', 'D:\\PF\\proiect bun\\tests\\ExampleTests\\UtilTimeTests.elm', 'D:\\PF\\proiect bun\\tests\\MainTests.elm', 'D:\\PF\\proiect bun\\tests\\PostsConfigTests.elm', 'D:\\PF\\proiect bun\\tests\\PostsViewTests.elm', 'D:\\PF\\proiect bun\\tests\\PostTests.elm', 'D:\\PF\\proiect bun\\tests\\SimulatedEffect.elm', 'D:\\PF\\proiect bun\\tests\\TestData.elm', 'D:\\PF\\proiect bun\\tests\\TestUtils.elm']),
 		processes: 16,
 		report: $author$project$Test$Reporter$Reporter$ConsoleReport($author$project$Console$Text$Monochrome),
 		runs: 100,
@@ -24600,12 +25058,6 @@ var $author$project$Test$Generated$Main$main = A2(
 	},
 	_List_fromArray(
 		[
-			_Utils_Tuple2(
-			'Example',
-			_List_fromArray(
-				[
-					$author$project$Test$Runner$Node$check($author$project$Example$suite)
-				])),
 			_Utils_Tuple2(
 			'ExampleTests.CursorTests',
 			_List_fromArray(
@@ -24684,7 +25136,7 @@ var $author$project$Test$Generated$Main$main = A2(
 _Platform_export({'Test':{'Generated':{'Main':{'init':$author$project$Test$Generated$Main$main($elm$json$Json$Decode$int)(0)}}}});}(this));
 return this.Elm;
 })({});
-var pipeFilename = "\\\\.\\pipe\\elm_test-15468-1";
+var pipeFilename = "\\\\.\\pipe\\elm_test-8660-1";
 var net = require('net'),
   client = net.createConnection(pipeFilename);
 

@@ -1,6 +1,5 @@
 module Test.Generated.Main exposing (main)
 
-import Example
 import ExampleTests.CursorTests
 import ExampleTests.ModelPostIdsTests
 import ExampleTests.ModelPostsConfigTests
@@ -28,8 +27,7 @@ main =
         , globs =
             []
         , paths =
-            [ "D:\\PF\\proiect bun\\tests\\Example.elm"
-            , "D:\\PF\\proiect bun\\tests\\ExampleTests\\CursorTests.elm"
+            [ "D:\\PF\\proiect bun\\tests\\ExampleTests\\CursorTests.elm"
             , "D:\\PF\\proiect bun\\tests\\ExampleTests\\ModelPostIdsTests.elm"
             , "D:\\PF\\proiect bun\\tests\\ExampleTests\\ModelPostsConfigTests.elm"
             , "D:\\PF\\proiect bun\\tests\\ExampleTests\\UtilTimeTests.elm"
@@ -42,11 +40,7 @@ main =
             , "D:\\PF\\proiect bun\\tests\\TestUtils.elm"
             ]
         }
-        [ ( "Example"
-          , [ Test.Runner.Node.check Example.suite
-            ]
-          )
-        , ( "ExampleTests.CursorTests"
+        [ ( "ExampleTests.CursorTests"
           , [ Test.Runner.Node.check ExampleTests.CursorTests.suite
             ]
           )

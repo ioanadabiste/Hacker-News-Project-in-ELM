@@ -62,15 +62,7 @@ posixToDate tz time =
     Date { year = year, month = month, day = day }
 
 
-{-| Formats a `Date` instance.
 
-    import Time
-
-    formatDate (Date { year = 2022, month = Time.Apr, day =  4 }) {- ignore -} --> "2022 Apr 04"
-
-    formatDate (Date { year = 2022, month = Time.Jan, day = 12 }) {- ignore -} --> "2022 Jan 12"
-
--}
 formatDate : Date -> String
 formatDate (Date date) =
     let
@@ -139,9 +131,43 @@ durationBetween (Time.millisToPosix 1000) (Time.millisToPosix 1000) --> Nothing
 
 -}
 durationBetween : Time.Posix -> Time.Posix -> Maybe Duration
-durationBetween _ _ =
-    -- Nothing
-    Debug.todo "durationBetween"
+durationBetween t1 t2 =
+    let
+        m1 =
+            Time.posixToMillis t1
+
+        m2 =
+            Time.posixToMillis t2
+
+        diff =
+            m2 - m1
+    in
+    if diff <= 0 then
+        Nothing
+    else
+        let
+            totalSeconds =
+                diff // 1000
+
+            days =
+                totalSeconds // (24 * 60 * 60)
+
+            rem1 =
+                totalSeconds - days * 24 * 60 * 60
+
+            hours =
+                rem1 // (60 * 60)
+
+            rem2 =
+                rem1 - hours * 60 * 60
+
+            minutes =
+                rem2 // 60
+
+            seconds =
+                rem2 - minutes * 60
+        in
+        Just (Duration seconds minutes hours days)
 
 
 {-| Format a `Duration` as a human readable string
@@ -164,6 +190,37 @@ durationBetween _ _ =
 
 -}
 formatDuration : Duration -> String
-formatDuration _ =
-    -- ""
-    Debug.todo "formatDuration"
+formatDuration d =
+    let
+        -- small units used only when > 0
+        s =
+            if d.seconds > 0 then
+                Just (String.fromInt d.seconds ++ " " ++ (if d.seconds == 1 then "second" else "seconds"))
+            else
+                Nothing
+
+        m =
+            if d.minutes > 0 then
+                Just (String.fromInt d.minutes ++ " " ++ (if d.minutes == 1 then "minute" else "minutes"))
+            else
+                Nothing
+
+        h =
+            if d.hours > 0 then
+                Just (String.fromInt d.hours ++ " " ++ (if d.hours == 1 then "hour" else "hours"))
+            else
+                Nothing
+
+        d_ =
+            if d.days > 0 then
+                Just (String.fromInt d.days ++ " " ++ (if d.days == 1 then "day" else "days"))
+            else
+                Nothing
+
+        parts =
+            List.filterMap identity [ d_, h, m, s ]
+
+        joined =
+            String.join " " parts
+    in
+    joined ++ " ago"
